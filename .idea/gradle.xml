@@ -5,6 +5,13 @@
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="gradleHome" value="$USER_HOME$/.sdkman/candidates/gradle/current" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/ModuleA" />
+            <option value="$PROJECT_DIR$/ModuleB" />
+          </set>
+        </option>
       </GradleProjectSettings>
     </option>
   </component>
