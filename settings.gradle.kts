@@ -1,3 +1,3 @@
-rootProject.name = "jar-depedency-analyser"
+rootProject.name = "jar-dependency-analyser"
 include("ModuleA")
 include("ModuleB")
