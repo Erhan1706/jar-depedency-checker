@@ -50,11 +50,7 @@ public class BytecodeParser {
                     curObject.nameIndex = readTwoBytes();
                     System.out.println("Name: " + curObject.nameIndex);
                     break;
-                case CONSTANT_Fieldref:
-                    curObject.classIndex = readTwoBytes();
-                    curObject.nameIndex = readTwoBytes();
-                    break;
-                case CONSTANT_Methodref:
+                case CONSTANT_Fieldref, CONSTANT_Methodref:
                     curObject.classIndex = readTwoBytes();
                     curObject.nameIndex = readTwoBytes();
                     break;
@@ -67,9 +63,10 @@ public class BytecodeParser {
                     break;
                 case CONSTANT_NameAndType:
                     curObject.nameIndex = readTwoBytes();
-                    curObject.descriptorIndex = readTwoBytes();
+                    curObject.stringIndex = readTwoBytes();
                     break;
                 case CONSTANT_String:
+                    curObject.stringIndex = readTwoBytes();
                     break;
                 case CONSTANT_InterfaceMethodref:
                     break;

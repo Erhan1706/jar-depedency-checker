@@ -5,7 +5,7 @@ public class ConstantPoolObject {
     public int nameIndex;
     public int classIndex;
     public byte[] bytes;
-    public int descriptorIndex;
+    public int stringIndex;
 
     public ConstantPoolObject(ConstantPoolTags tag) {
         this.tag = tag;

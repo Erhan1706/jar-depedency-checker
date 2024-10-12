@@ -7,7 +7,7 @@ import java.util.Map;
 public class ClassFile {
     int minor;
     int major;
-    List<ConstantPoolObject> constantPool = new ArrayList<>();
+    public List<ConstantPoolObject> constantPool = new ArrayList<>();
     List<String> accessFlags = new ArrayList<>();
     int thisClass;
     int superClass;
