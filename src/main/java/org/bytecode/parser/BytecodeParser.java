@@ -41,25 +41,37 @@ public class BytecodeParser {
         readFourBytes(); // skip magic number
         classFile.minor = readTwoBytes();
         classFile.major = readTwoBytes();
+        parseConstantPool(classFile);
+
+        return classFile;
+    }
+
+    private void parseConstantPool(ClassFile classFile) {
         int constantPoolCount = readTwoBytes();
         for (int i = 0; i < constantPoolCount - 1; i++) {
             ConstantPoolTags tag = ConstantPoolTags.getTagByValue(readOneByte());
             ConstantPoolObject curObject = new ConstantPoolObject(tag);
+            if (i == 55) {
+                System.out.println("yo");
+            }
             switch (tag) {
-                case CONSTANT_Class:
+                case CONSTANT_Class, CONSTANT_MethodType:
                     curObject.nameIndex = readTwoBytes();
-                    System.out.println("Name: " + curObject.nameIndex);
                     break;
-                case CONSTANT_Fieldref, CONSTANT_Methodref:
+                case CONSTANT_Fieldref, CONSTANT_Methodref, CONSTANT_InterfaceMethodref, CONSTANT_InvokeDynamic:
                     curObject.classIndex = readTwoBytes();
                     curObject.nameIndex = readTwoBytes();
                     break;
                 case CONSTANT_Utf8:
                     int length = readTwoBytes();
-                    byte[] utf8Bytes = readBytes(length);
-                    curObject.bytes = utf8Bytes;
-                    String utf8String = new String(utf8Bytes, StandardCharsets.UTF_8);
-                    //System.out.println("UTF-8 String: " + utf8String);
+                    curObject.bytes = readBytes(length);
+                    break;
+                case CONSTANT_Integer, CONSTANT_Float:
+                    curObject.bytes = readBytes(4);
+                    break;
+                case CONSTANT_Long, CONSTANT_Double:
+                    curObject.highBytes = readBytes(4);
+                    curObject.lowBytes = readBytes(4);
                     break;
                 case CONSTANT_NameAndType:
                     curObject.nameIndex = readTwoBytes();
@@ -68,16 +80,14 @@ public class BytecodeParser {
                 case CONSTANT_String:
                     curObject.stringIndex = readTwoBytes();
                     break;
-                case CONSTANT_InterfaceMethodref:
+                case CONSTANT_MethodHandle:
+                    curObject.referenceKind = readOneByte();
+                    curObject.nameIndex = readTwoBytes();
                     break;
                 default:
                     throw new IllegalArgumentException("Unhandled constant pool tag: " + tag);
-                    //break;
             }
             classFile.constantPool.add(curObject);
         }
-        System.out.println(classFile.constantPool);
-
-        return classFile;
     }
 }
