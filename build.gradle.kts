@@ -1,8 +1,9 @@
 plugins {
     id("java")
+    id("application")
 }
 
-group = "org.example"
+group = "org.analyser"
 version = "1.0"
 
 subprojects {
@@ -26,7 +27,6 @@ subprojects {
     }
 }
 
-
 repositories {
     mavenCentral()
 }
@@ -36,6 +36,10 @@ dependencies {
     implementation(project(":ModuleB"))
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+}
+
+application {
+    mainClass.set("org.analyser.Main")
 }
 
 tasks.test {
