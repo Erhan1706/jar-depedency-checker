@@ -34,10 +34,9 @@ public class MainClassAnalyser {
 
         URI uri = resourceUrl.toURI();
         String scheme = uri.getScheme();
-        Path path = Paths.get(uri);
         if (scheme.equals("file")) {
             // Class file is in the regular file system
-            return path;
+            return Paths.get(uri);
         } else if (scheme.equals("jar")) {
             // Class file is inside a JAR
             try {
@@ -49,7 +48,7 @@ public class MainClassAnalyser {
                 env.put("create", "true");
                 FileSystems.newFileSystem(uri, env);
             }
-            return path;
+            return Paths.get(uri);
         } else {
             throw new IOException("Unsupported resource URL scheme: " + scheme);
         }
