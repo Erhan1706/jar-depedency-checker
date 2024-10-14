@@ -20,21 +20,19 @@ public class MainClassAnalyser {
         Class<?> clazz = Class.forName(className);
         String resourceName = clazz.getSimpleName() + ".class";
         URL resourceUrl = clazz.getResource(resourceName);
-
         if (resourceUrl == null) {
-            throw new IOException("Could not find class file for " + className);
+            //throw new IOException("Could not find class file for " + className);
+            System.out.println("Resource not found: " + resourceName);
+            return null;
         }
 
         URI uri = resourceUrl.toURI();
         String scheme = uri.getScheme();
 
-        // Look into what this code does later
-
-
-        if ("file".equals(scheme)) {
+        if (scheme.equals("file")) {
             // Class file is in the regular file system
             return Paths.get(uri);
-        } else if ("jar".equals(scheme)) {
+        } else if (scheme.equals("jar")) {
             // Class file is inside a JAR
             try {
                 // Try to get existing filesystem for the JAR
@@ -45,7 +43,6 @@ public class MainClassAnalyser {
                 env.put("create", "true");
                 FileSystems.newFileSystem(uri, env);
             }
-
             return Paths.get(uri);
         } else {
             throw new IOException("Unsupported resource URL scheme: " + scheme);
@@ -55,7 +52,7 @@ public class MainClassAnalyser {
     public static Set<String> getBytecodeClassDependencies(ClassFile classFile) {
         Set<String> dependencies = new HashSet<>();
         for (ConstantPoolObject curObj : classFile.constantPool) {
-            if (curObj.tag == ConstantPoolTags.CONSTANT_Class) {
+            if (curObj != null && curObj.tag == ConstantPoolTags.CONSTANT_Class) {
                 ConstantPoolObject nameRef = classFile.constantPool.get(curObj.nameIndex - 1);
                 dependencies.add(new String(nameRef.bytes, StandardCharsets.UTF_8));
             }
@@ -65,6 +62,9 @@ public class MainClassAnalyser {
 
     public static Set<String> temp(String curPath) throws IOException, URISyntaxException, ClassNotFoundException {
         Path filePath = getClassPath(curPath);
+        if (filePath == null) {
+            return null;
+        }
         byte[] classData = Files.readAllBytes(filePath);
         BytecodeParser parser = new BytecodeParser(classData);
         ClassFile classFile = parser.parseBytecode();
@@ -84,7 +84,11 @@ public class MainClassAnalyser {
             String current = toCheck.poll();
             if (checked.contains(current)) continue;
             checked.add(current);
-            Set<String> curDependencies = temp(current);
+            Set<String> curDependencies = temp(current); // Rename this
+            if (curDependencies == null) {
+                dependencies.remove(current.replace('.','/'));
+                continue;
+            }
             dependencies.addAll(curDependencies);
             for (String dependency: curDependencies) {
                 String dependencyPackage = dependency.replace('/','.');

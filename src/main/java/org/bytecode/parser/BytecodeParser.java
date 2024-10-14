@@ -42,7 +42,7 @@ public class BytecodeParser {
         classFile.minor = readTwoBytes();
         classFile.major = readTwoBytes();
         parseConstantPool(classFile);
-
+        // There is more information that can be parsed from the bytecode, but the constant pool is all I'm interested about
         return classFile;
     }
 
@@ -51,9 +51,6 @@ public class BytecodeParser {
         for (int i = 0; i < constantPoolCount - 1; i++) {
             ConstantPoolTags tag = ConstantPoolTags.getTagByValue(readOneByte());
             ConstantPoolObject curObject = new ConstantPoolObject(tag);
-            if (i == 55) {
-                System.out.println("yo");
-            }
             switch (tag) {
                 case CONSTANT_Class, CONSTANT_MethodType:
                     curObject.nameIndex = readTwoBytes();
@@ -65,6 +62,7 @@ public class BytecodeParser {
                 case CONSTANT_Utf8:
                     int length = readTwoBytes();
                     curObject.bytes = readBytes(length);
+                    String s = new String(curObject.bytes, StandardCharsets.UTF_8);
                     break;
                 case CONSTANT_Integer, CONSTANT_Float:
                     curObject.bytes = readBytes(4);
@@ -72,6 +70,7 @@ public class BytecodeParser {
                 case CONSTANT_Long, CONSTANT_Double:
                     curObject.highBytes = readBytes(4);
                     curObject.lowBytes = readBytes(4);
+                    i += 1;
                     break;
                 case CONSTANT_NameAndType:
                     curObject.nameIndex = readTwoBytes();
@@ -88,6 +87,8 @@ public class BytecodeParser {
                     throw new IllegalArgumentException("Unhandled constant pool tag: " + tag);
             }
             classFile.constantPool.add(curObject);
+            if (tag == ConstantPoolTags.CONSTANT_Double || tag == ConstantPoolTags.CONSTANT_Long)
+                classFile.constantPool.add(null);
         }
     }
 }

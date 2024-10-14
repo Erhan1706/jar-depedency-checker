@@ -30,15 +30,13 @@ public class Main {
         // Step 2: Collect all necessary class files from the main class
         Set<String> mainDependencies = MainClassAnalyser.getMainDependencies(mainClass);
 
-
-//        for (String dependency : dependencies) {
-//            try {
-//                String d = dependency.replace('/', '.');
-//                Path dependencyPath = MainClassAnalyser.getClassPath(d);
-//                System.out.println(dependency);
-//            } catch (Exception e) {
-//                continue;
-//            }
-//        }
+        for (String mainDependency : mainDependencies) {
+            if (!jarDependencies.contains(mainDependency + ".class")) {
+                System.out.println("False");
+                System.out.println("Dependency: " + mainDependency + " not found");
+                return;
+            }
+        }
+        System.out.println("True");
     }
 }
