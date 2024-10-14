@@ -2,8 +2,10 @@ package org.bytecode.parser;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
+/**
+ * Representation of the Java Virtual Machine .class file format
+ */
 public class ClassFile {
     int minor;
     int major;

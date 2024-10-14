@@ -29,6 +29,7 @@ public class BytecodeParser {
         return (byte1 << 24) | (byte2 << 16) | (byte3 << 8) | byte4;
     }
 
+    // Read arbitrary number of bytes. Return byte array instead of integer.
     private byte[] readBytes(int numBytes) {
         byte[] result = new byte[numBytes];
         System.arraycopy(bytes, pointer, result, 0, numBytes);
@@ -36,16 +37,24 @@ public class BytecodeParser {
         return result;
     }
 
+    /**
+     * Parses the bytecode of a .class file and constructs a {@code ClassFile} object.
+     * @return a ClassFile object containing parsed data from the bytecode.
+     */
     public ClassFile parseBytecode() {
         ClassFile classFile = new ClassFile();
         readFourBytes(); // skip magic number
         classFile.minor = readTwoBytes();
         classFile.major = readTwoBytes();
         parseConstantPool(classFile);
-        // There is more information that can be parsed from the bytecode, but the constant pool is all I'm interested about
+        // There is more that can be parsed from the bytecode, but all the necessary information is on the constant pool
         return classFile;
     }
 
+    /**
+     * Parses the constant pool section of the .class file bytecode.
+     * @param classFile ClassFile object populated with all constant pool entries
+     */
     private void parseConstantPool(ClassFile classFile) {
         int constantPoolCount = readTwoBytes();
         for (int i = 0; i < constantPoolCount - 1; i++) {
@@ -62,7 +71,6 @@ public class BytecodeParser {
                 case CONSTANT_Utf8:
                     int length = readTwoBytes();
                     curObject.bytes = readBytes(length);
-                    String s = new String(curObject.bytes, StandardCharsets.UTF_8);
                     break;
                 case CONSTANT_Integer, CONSTANT_Float:
                     curObject.bytes = readBytes(4);
@@ -70,7 +78,7 @@ public class BytecodeParser {
                 case CONSTANT_Long, CONSTANT_Double:
                     curObject.highBytes = readBytes(4);
                     curObject.lowBytes = readBytes(4);
-                    i += 1;
+                    i += 1; // Skip one index since these objects take two indexes in the constant pull
                     break;
                 case CONSTANT_NameAndType:
                     curObject.nameIndex = readTwoBytes();
@@ -88,7 +96,7 @@ public class BytecodeParser {
             }
             classFile.constantPool.add(curObject);
             if (tag == ConstantPoolTags.CONSTANT_Double || tag == ConstantPoolTags.CONSTANT_Long)
-                classFile.constantPool.add(null);
+                classFile.constantPool.add(null); // Need to preserve the right order of the indexes on the constant pool list when we come across doubles or longs
         }
     }
 }

@@ -1,5 +1,8 @@
 package org.bytecode.parser;
 
+/**
+ * Represents a single object in the Java Class File Constant Pool.
+ */
 public class ConstantPoolObject {
     public ConstantPoolTags tag;
     public int nameIndex;

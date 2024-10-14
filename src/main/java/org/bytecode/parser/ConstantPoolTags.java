@@ -1,5 +1,8 @@
 package org.bytecode.parser;
 
+/**
+ * Enum representing the tags used in the Java Class File Constant Pool.
+ */
 public enum ConstantPoolTags {
     CONSTANT_Class(7),
     CONSTANT_Fieldref(9),
@@ -26,7 +29,12 @@ public enum ConstantPoolTags {
         return value;
     }
 
-    // Method to get the enum from an int value
+    /**
+     * Retrieves the corresponding {@code ConstantPoolTags} enum for a given integer value
+     * @param value the integer value of the constant pool tag
+     * @return the {@code ConstantPoolTags} enum corresponding to the value
+     * @throws IllegalArgumentException if the value does not correspond to any known constant pool tag
+     */
     public static ConstantPoolTags getTagByValue(int value) {
         for (ConstantPoolTags tag : ConstantPoolTags.values()) {
             if (tag.getValue() == value) {
